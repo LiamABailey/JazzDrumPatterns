@@ -1,0 +1,9 @@
+# binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# coverage tool output
+*.out
