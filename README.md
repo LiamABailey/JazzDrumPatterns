@@ -27,6 +27,6 @@ The `Jazz Drum Patterns` project slots in after the above examples have been exh
 ## `Jazz Drum Patterns`
 
 The project will be implemented in three phases:
-Phase 1: Development of the underlying pattern generator functionality
-Phase 2: Using generated patterns to construct measures of sheet music
-Phase 3: Creating a web application to serve as a UI
+- Phase 1: Development of the underlying pattern generator functionality
+- Phase 2: Using generated patterns to construct measures of sheet music
+- Phase 3: Creating a web application to serve as a UI
