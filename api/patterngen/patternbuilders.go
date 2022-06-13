@@ -19,12 +19,12 @@ const (
 // the allowed patterns for each limb +
 // number of desired beats
 func getMeasures(ctx *gin.Context) {
-  bass := c.DefaultQuery("bass", defaultPatterns)
-  hihat := c.DefaultQuery("hihat", defaultPatterns)
-  ride := c.DefaultQuery("ride", defaultPatterns)
-  snare := c.DefaultQuery("snare", defaultPatterns)
-  beats := strconv.Atoi(c.DefaultQuery("beats", defaultBeats))
-  measures:= strconv.Atoi(c.DefaultQuery("measures", defaultMeasures))
+  bass := ctx.DefaultQuery("bass", defaultPatterns)
+  hihat := ctx.DefaultQuery("hihat", defaultPatterns)
+  ride := ctx.DefaultQuery("ride", defaultPatterns)
+  snare := ctx.DefaultQuery("snare", defaultPatterns)
+  beats, _ := strconv.Atoi(ctx.DefaultQuery("beats", defaultBeats))
+  //measures, _:= strconv.Atoi(ctx.DefaultQuery("measures", defaultMeasures))
 
   bassPatterns, berr := convertPatternLists(bass)
   hihatPatterns, hherr := convertPatternLists(hihat)
@@ -38,7 +38,7 @@ func getMeasures(ctx *gin.Context) {
   // TODO: What if multiple measures are requested?
   consBeats := make([]patterns.Beat, beats)
   for i := 0; i < beats; i++ {
-    consBeats[i] = patterns.GenerateBeatPattern(
+    consBeats[i] = *patterns.GenerateBeatPattern(
                         ridePatterns, snarePatterns,
                           bassPatterns,hihatPatterns)
   }
@@ -55,8 +55,8 @@ func convertPatternLists(pat string) ([]int, error) {
   for i, v := range sepPat {
     iPat[i], cerr = strconv.Atoi(v)
     if cerr != nil {
-      return _, cerr
+      return nil, cerr
     }
   }
-  return iPat, _
+  return iPat, nil
 }

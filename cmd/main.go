@@ -1,12 +1,10 @@
 package main
 
 import (
-  "fmt"
-
-  "internal/patterns"
+  "api/patterngen"
 )
 
 func main() {
-  fmt.Println(patterns.GenerateBeatPattern([]int{0,1,2},[]int{4,5},
-                                           []int{1},[]int{1}))
+  patternsrv := patterngen.NewPatternServer()
+  patternsrv.Run()
 }

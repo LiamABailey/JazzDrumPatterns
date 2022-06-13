@@ -4,13 +4,12 @@ import (
 )
 
 type PatternServer struct {
-  router gin.Router
+  router gin.Engine
 }
 
-func NewPatternServer() *PatternServer {
-  // add routes here
-}
+func NewPatternServer() *gin.Engine {
+  r := gin.Default()
+  r.GET("/GetMeasures", getMeasures)
 
-func (p *PatternServer) Run() {
-  p.router.run()
+  return r
 }
