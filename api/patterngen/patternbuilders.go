@@ -15,7 +15,6 @@ import (
 const (
   defaultPatterns string = "0"
   defaultBeats string = "4"
-  defaultMeasures string = "1"
 )
 // Generate a single measure of beats
 // the allowed patterns for each limb +
@@ -26,7 +25,6 @@ func getMeasure(ctx *gin.Context) {
   ride := ctx.DefaultQuery("ride", defaultPatterns)
   snare := ctx.DefaultQuery("snare", defaultPatterns)
   beats, _ := strconv.Atoi(ctx.DefaultQuery("beats", defaultBeats))
-  //measures, _:= strconv.Atoi(ctx.DefaultQuery("measures", defaultMeasures))
 
   bassPatterns, berr := convertPatternLists(bass)
   hihatPatterns, hherr := convertPatternLists(hihat)
