@@ -2,7 +2,6 @@ package patterngen
 
 import (
   "encoding/json"
-  "fmt"
   "net/http"
   "strings"
   "strconv"
@@ -15,6 +14,7 @@ import (
 const (
   defaultPatterns string = "0"
   defaultBeats string = "4"
+  beatIdentifier string = "b"
 )
 // Generate a single measure of beats
 // the allowed patterns for each limb +
@@ -38,7 +38,6 @@ func getMeasure(ctx *gin.Context) {
 
   consBeats := make([]patterns.Beat, beats)
   for i := 0; i < beats; i++ {
-    fmt.Println(ridePatterns)
     consBeats[i] = *patterns.GenerateBeatPattern(
                         ridePatterns, snarePatterns,
                           bassPatterns,hihatPatterns)
@@ -48,6 +47,23 @@ func getMeasure(ctx *gin.Context) {
   ctx.JSON(http.StatusOK, gin.H{"pattern": string(pattern)})
 }
 
+func generateMeasureFromBeats(ctx *gin.Context) {
+  // looks for b# identifiers, starting with b0
+  ok := true
+  ix := 0
+  var measureDefinitions []string
+  for ok {
+    beatId := beatIdentifier + strconv.Itoa(ix)
+    var beatDef string
+    beatDef, ok = ctx.GetQuery(beatId)
+    if ok {
+      measureDefinitions = append(measureDefinitions, beatDef)
+    }
+    ix += 1
+  }
+  // as a placeholder, echo the parsed data
+  ctx.JSON(http.StatusOK, gin.H{"parsed_data": strings.Join(measureDefinitions[:],"|")})
+}
 
 func convertPatternLists(pat string) ([]int, error) {
   sepPat := strings.Split(pat, ",")

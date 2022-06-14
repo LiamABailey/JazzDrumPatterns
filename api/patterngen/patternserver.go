@@ -1,15 +1,17 @@
 package patterngen
+
 import (
-  "github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 )
 
 type PatternServer struct {
-  router gin.Engine
+	router gin.Engine
 }
 
 func NewPatternServer() *gin.Engine {
-  r := gin.Default()
-  r.GET("/GetMeasure", getMeasure)
+	r := gin.Default()
+	r.GET("/GetMeasure", getMeasure)
+	r.GET("/GetMeasureFromBeats", generateMeasureFromBeats)
 
-  return r
+	return r
 }

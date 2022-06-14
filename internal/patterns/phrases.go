@@ -1,10 +1,10 @@
 package patterns
 
 type Beat struct {
-  Ride  int `json: ride_pattern`
-  Snare int  `json: snare_pattern`
-  Bass  int  `json: bass_pattern`
-  Hh    int  `json: hh_pattern`
+  Ride  int `json: ride`
+  Snare int  `json: snare`
+  Bass  int  `json: bass`
+  Hh    int  `json: hihat`
 }
 
 func NewBeat(ride, snare, bass, hh int) *Beat {
