@@ -1,10 +1,12 @@
 package patterngen
 
 import (
+  "encoding/json"
+  "fmt"
+  "net/http"
   "strings"
   "strconv"
 
-  "net/http"
   "github.com/gin-gonic/gin"
 
   "internal/patterns"
@@ -15,10 +17,10 @@ const (
   defaultBeats string = "4"
   defaultMeasures string = "1"
 )
-// Generate one or more measures of beats given
+// Generate a single measure of beats
 // the allowed patterns for each limb +
 // number of desired beats
-func getMeasures(ctx *gin.Context) {
+func getMeasure(ctx *gin.Context) {
   bass := ctx.DefaultQuery("bass", defaultPatterns)
   hihat := ctx.DefaultQuery("hihat", defaultPatterns)
   ride := ctx.DefaultQuery("ride", defaultPatterns)
@@ -35,16 +37,17 @@ func getMeasures(ctx *gin.Context) {
     ctx.JSON(http.StatusBadRequest, gin.H{"error": "Received malformed pattern parameter"})
     return
   }
-  // TODO: What if multiple measures are requested?
+
   consBeats := make([]patterns.Beat, beats)
   for i := 0; i < beats; i++ {
+    fmt.Println(ridePatterns)
     consBeats[i] = *patterns.GenerateBeatPattern(
                         ridePatterns, snarePatterns,
                           bassPatterns,hihatPatterns)
   }
-
-  // TODO: how to structure and return?
-  ctx.JSON(http.StatusOK, gin.H{"message": "created pattern"})
+  meas := patterns.NewMeasure(consBeats)
+  pattern, _ := json.Marshal(*meas)
+  ctx.JSON(http.StatusOK, gin.H{"pattern": string(pattern)})
 }
 
 

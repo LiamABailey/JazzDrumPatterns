@@ -9,7 +9,7 @@ type PatternServer struct {
 
 func NewPatternServer() *gin.Engine {
   r := gin.Default()
-  r.GET("/GetMeasures", getMeasures)
+  r.GET("/GetMeasure", getMeasure)
 
   return r
 }
