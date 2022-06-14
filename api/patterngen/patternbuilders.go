@@ -15,6 +15,7 @@ const (
   defaultPatterns string = "0"
   defaultBeats string = "4"
   beatIdentifier string = "b"
+  outerSep string = ","
 )
 // Generate a single measure of beats
 // the allowed patterns for each limb +
@@ -26,10 +27,10 @@ func getMeasure(ctx *gin.Context) {
   snare := ctx.DefaultQuery("snare", defaultPatterns)
   beats, _ := strconv.Atoi(ctx.DefaultQuery("beats", defaultBeats))
 
-  bassPatterns, berr := convertPatternLists(bass)
-  hihatPatterns, hherr := convertPatternLists(hihat)
-  ridePatterns, rerr := convertPatternLists(ride)
-  snarePatterns, serr := convertPatternLists(snare)
+  bassPatterns, berr := convertPatternLists(bass, outerSep)
+  hihatPatterns, hherr := convertPatternLists(hihat, outerSep)
+  ridePatterns, rerr := convertPatternLists(ride, outerSep)
+  snarePatterns, serr := convertPatternLists(snare, outerSep)
 
   if berr != nil || hherr != nil || rerr != nil || serr != nil {
     ctx.JSON(http.StatusBadRequest, gin.H{"error": "Received malformed pattern parameter"})
@@ -65,8 +66,8 @@ func generateMeasureFromBeats(ctx *gin.Context) {
   ctx.JSON(http.StatusOK, gin.H{"parsed_data": strings.Join(measureDefinitions[:],"|")})
 }
 
-func convertPatternLists(pat string) ([]int, error) {
-  sepPat := strings.Split(pat, ",")
+func convertPatternLists(pat string, sep string) ([]int, error) {
+  sepPat := strings.Split(pat, sep)
   iPat := make([]int, len(sepPat))
   var cerr error
   for i, v := range sepPat {
