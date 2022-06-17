@@ -53,7 +53,8 @@ func getMeasure(ctx *gin.Context) {
   ctx.JSON(http.StatusOK, gin.H{"pattern": string(pattern)})
 }
 
-//
+// Given the construction request of one or more beats,
+// produce a measure meeting the constraints
 func generateMeasureFromBeats(ctx *gin.Context) {
   // looks for b# identifiers, starting with b0
   ok := true
