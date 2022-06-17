@@ -2,6 +2,8 @@ package patterngen
 
 import (
   "encoding/json"
+  "fmt"
+  "log"
   "net/http"
   "strings"
   "strconv"
@@ -14,9 +16,12 @@ import (
 const (
   defaultPatterns string = "0"
   defaultBeats string = "4"
+  beatComponents int = 4
   beatIdentifier string = "b"
+  innerSep string = "|"
   outerSep string = ","
 )
+
 // Generate a single measure of beats
 // the allowed patterns for each limb +
 // number of desired beats
@@ -41,13 +46,14 @@ func getMeasure(ctx *gin.Context) {
   for i := 0; i < beats; i++ {
     consBeats[i] = *patterns.GenerateBeatPattern(
                         ridePatterns, snarePatterns,
-                          bassPatterns,hihatPatterns)
+                          bassPatterns, hihatPatterns)
   }
   meas := patterns.NewMeasure(consBeats)
   pattern, _ := json.Marshal(*meas)
   ctx.JSON(http.StatusOK, gin.H{"pattern": string(pattern)})
 }
 
+//
 func generateMeasureFromBeats(ctx *gin.Context) {
   // looks for b# identifiers, starting with b0
   ok := true
@@ -62,8 +68,38 @@ func generateMeasureFromBeats(ctx *gin.Context) {
     }
     ix += 1
   }
-  // as a placeholder, echo the parsed data
-  ctx.JSON(http.StatusOK, gin.H{"parsed_data": strings.Join(measureDefinitions[:],"|")})
+  // generate a pattern from each beat definition
+  parsedMeasDef := make([]patterns.Beat, len(measureDefinitions))
+  for i, mDef := range measureDefinitions {
+    // get each component of the beat
+    sepParts := strings.Split(mDef, outerSep)
+    if len(sepParts) != beatComponents {
+      log.Println("Expected beat construction request to have ", beatComponents,
+                  " components, received ", len(sepParts))
+      ctx.JSON(http.StatusBadRequest,
+            gin.H{"error": fmt.Sprintf("Each beat must have %s components", beatComponents)})
+      return
+    }
+    // convert the requested compoent IDs to integers
+    parsedBeatDefinition := make([][]int, beatComponents)
+    for c := 0; c < beatComponents; c++ {
+      var err error
+      parsedBeatDefinition[c], err = convertPatternLists(sepParts[c], innerSep)
+      if err != nil{
+        log.Println("Encountered error trying to parse beat components: ", err)
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Couldn't parse %s", sepParts[c])})
+      }
+    }
+    // generate the beat & store
+    parsedMeasDef[i] = *patterns.GenerateBeatPattern(
+                    parsedBeatDefinition[0],
+                    parsedBeatDefinition[1],
+                    parsedBeatDefinition[2],
+                    parsedBeatDefinition[3])
+  }
+  meas := patterns.NewMeasure(parsedMeasDef)
+  pattern, _ := json.Marshal(*meas)
+  ctx.JSON(http.StatusOK, gin.H{"pattern": string(pattern)})
 }
 
 func convertPatternLists(pat string, sep string) ([]int, error) {
