@@ -2,8 +2,10 @@ package patterngen
 
 import (
   "embed"
+  "encoding/base64"
   "fmt"
   "io/fs"
+  "net/http"
 
   "github.com/gin-gonic/gin"
 
@@ -32,22 +34,24 @@ import (
 //}
 
 // retrieve a single beat component image from a given source
-func retrieveImage(rhythm1, rhythm2 int, dir embed.FS) ([]byte, error){
-  fmt.Println(rhythm1, rhythm2)
+func retrieveImage(rhythm1, rhythm2 int, dir embed.FS) (string, error) {
+  imName := fmt.Sprintf("%d_%d.svg", rhythm1, rhythm2)
+  imbytes, rerr := fs.ReadFile(dir,  fmt.Sprintf("%s/%s", getDirName(dir), imName))
+  if rerr != nil {
+    return "", rerr 
+  }
+  imb64 := base64.StdEncoding.EncodeToString(imbytes)
+  return imb64, nil
 
-  testNames, _ := fs.Glob(dir, fmt.Sprintf("%s/*.png", getDirName(dir)))
-  return fs.ReadFile(dir,  testNames[0])
-  // TODO: impelement
-  // imname := fmt.Sprintf("%s_%s.png", rhythm1, rhythm2)
-
-  // construct path
-  // check if file exists. If so, return w/o error. else, return nil and FileNotFound. 
 }
 
 func TestRetrieve(ctx *gin.Context) {
   fmt.Println(ctx)
   data, err := retrieveImage(0,0, beatimages.RideSnareImages)
-  fmt.Println(data, err)
+  if err != nil {
+    ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+  }
+  ctx.JSON(http.StatusOK, gin.H{"svg": data})
 }
 
 // get the name of the root of the
