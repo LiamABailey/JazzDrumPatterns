@@ -13,6 +13,7 @@ func NewPatternServer() *gin.Engine {
 	r.GET("/GetMeasure", getMeasure)
 	r.GET("/GetMeasureFromBeats", generateMeasureFromBeats)
 	r.GET("/ImageGenTest", TestRetrieve)
+	r.GET("/GetMeasureImage", getMeasureImage)
 
 	return r
 }

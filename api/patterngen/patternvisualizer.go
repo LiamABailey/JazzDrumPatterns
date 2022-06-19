@@ -6,6 +6,7 @@ import (
   "fmt"
   "io/fs"
   "net/http"
+  "strconv"
 
   "github.com/gin-gonic/gin"
 
@@ -28,27 +29,34 @@ func getMeasureImage(ctx *gin.Context) {
   if qerr != nil {
     ctx.JSON(http.StatusBadRequest,
         gin.H{"error": fmt.Sprintf("Unable to parse query: %s", qerr.Error())})
+        return
   }
   // for each segment
-  for _, bSeg := range beatSegments {
+  returnData := gin.H{}
+  for beatIx, bSeg := range beatSegments {
     //split into ride/snare/bass/hh 
     beatComponents, serr := splitConvertPatternLists(bSeg, querySep)
     if serr != nil {
       ctx.JSON(http.StatusBadRequest,
         gin.H{"error": fmt.Sprintf("Unable to parse query segment %s: %s",bSeg, serr.Error())})
+        return
     }
     if len(beatComponents) != 4 {
       ctx.JSON(http.StatusBadRequest,
         gin.H{"error": fmt.Sprintf("Expected 4 segments: ride/snare/bass/hh, received: %s",bSeg)})
+        return
     }
     imRS, imRSerr := retrieveImage(beatComponents[0], beatComponents[1], beatimages.RideSnareImages)
     imBHH, imBHHerr := retrieveImage(beatComponents[2], beatComponents[3], beatimages.KickHiHatImages)
     if (imRSerr != nil) || (imBHHerr != nil){
       ctx.JSON(http.StatusInternalServerError,
         gin.H{"error": fmt.Sprintf("Unable to retrieve images. Errors: Ride/Snare: %s; Bass/HiHat: %s", imRSerr.Error(), imBHHerr.Error())})
+        return
     }
-    ctx.JSON(http.StatusOK, gin.H{"Ride-Snare": imRS, "Bass-HiHat": imBHH})
+    beatIxStr := strconv.Itoa(beatIx)
+    returnData[beatIxStr] = gin.H{"Ride-Snare": imRS, "Bass-HiHat": imBHH}
   }
+  ctx.JSON(http.StatusOK, returnData)
 
 }
 
