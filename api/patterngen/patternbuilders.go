@@ -59,6 +59,7 @@ func generateMeasureFromBeats(ctx *gin.Context) {
   if qerr != nil {
     ctx.JSON(http.StatusBadRequest,
         gin.H{"error": fmt.Sprintf("Unable to parse query: %s", qerr.Error())})
+    return
   }
   // generate a pattern from each beat definition
   parsedMeasDef := make([]patterns.Beat, len(measureDefinitions))
@@ -70,6 +71,7 @@ func generateMeasureFromBeats(ctx *gin.Context) {
                   " components, received ", len(sepParts))
       ctx.JSON(http.StatusBadRequest,
             gin.H{"error": fmt.Sprintf("Each beat must have %d components", beatComponents)})
+      return
     }
     // convert the requested compoent IDs to integers
     parsedBeatDefinition := make([][]int, beatComponents)
@@ -79,6 +81,7 @@ func generateMeasureFromBeats(ctx *gin.Context) {
       if err != nil{
         log.Println("Encountered error trying to parse beat components: ", err)
         ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Couldn't parse %s", sepParts[c])})
+        return
       }
     }
     // generate the beat & store

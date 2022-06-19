@@ -36,13 +36,13 @@ func splitBeatQuery(query map[string][]string) ([]string, error) {
 		return make([]string, 0), fmt.Errorf("Beat IDs not supported: %s", unsupportedIds)
 	}
 	// else, sort keys
-	mKeys := make([]int, len(parsedBeats))
+	var mKeys []int
 	for k := range parsedBeats {
 		mKeys = append(mKeys, k)
 	}
 	sort.Ints(mKeys)
 	// sort the beat values using the key order, from least to greatest
-	sortedBeats := make([]string, len(mKeys))
+	var sortedBeats []string
 	for sk := range mKeys {
 		sortedBeats = append(sortedBeats, parsedBeats[sk])
 	}	
