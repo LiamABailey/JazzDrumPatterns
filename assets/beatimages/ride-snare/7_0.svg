@@ -7,43 +7,13 @@
    viewBox="0 0 210 297"
    version="1.1"
    id="svg5"
-   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
-   sodipodi:docname="7_0.svg"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:cc="http://creativecommons.org/ns#">
-  <sodipodi:namedview
-     id="namedview7"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="mm"
-     showgrid="true"
-     inkscape:zoom="0.75455247"
-     inkscape:cx="130.54096"
-     inkscape:cy="506.26035"
-     inkscape:window-width="1680"
-     inkscape:window-height="1027"
-     inkscape:window-x="1912"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="layer2">
-    <inkscape:grid
-       type="xygrid"
-       id="grid58" />
-  </sodipodi:namedview>
   <defs
      id="defs2" />
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
      id="layer1"
      style="display:inline">
     <rect
@@ -83,9 +53,7 @@
        y="110.85715" />
   </g>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Layer 2">
+     id="layer2">
     <g
        id="g1229">
       <g
