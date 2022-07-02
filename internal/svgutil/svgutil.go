@@ -27,12 +27,6 @@ func getGroups(svg []byte) ([]G, error) {
 	if e != nil {
 		return make([]G, 0), e
 	}
-	// clear namespace 
-	for i := range svgData.Groups {
-		fmt.Println(svgData.Groups[i].XMLName)
-		svgData.Groups[i].XMLName.Space = ""
-		fmt.Println(svgData.Groups[i].XMLName)
-	}
 	return svgData.Groups, nil 
 }
 
