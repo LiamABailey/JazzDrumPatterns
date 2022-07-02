@@ -11,10 +11,8 @@ import (
   "github.com/gin-gonic/gin"
 
   "assets/beatimages"
+  "internal/svgutil"
 )
-//"image"
-//"image/png"
-//"image/draw"
 
 const (
   querySep string = ","
@@ -51,10 +49,17 @@ func getMeasureImage(ctx *gin.Context) {
     if (imRSerr != nil) || (imBHHerr != nil){
       ctx.JSON(http.StatusInternalServerError,
         gin.H{"error": fmt.Sprintf("Unable to retrieve images. Errors: Ride/Snare: %s; Bass/HiHat: %s", imRSerr.Error(), imBHHerr.Error())})
-        return
+      return
     }
     beatIxStr := strconv.Itoa(beatIx)
-    returnData[beatIxStr] = gin.H{"Ride-Snare": imRS, "Bass-HiHat": imBHH}
+    mergedSvg, mergeErr := svgutil.CombineSVG(imRS, imBHH)
+    if mergeErr != nil {
+      ctx.JSON(http.StatusInternalServerError,
+        gin.H{"error": fmt.Sprintf("Unable to merge images. Error: %s", mergeErr.Error())})
+      return 
+    }
+    imb64 := base64.StdEncoding.EncodeToString(mergedSvg)
+    returnData[beatIxStr] = gin.H{"image":imb64}
   }
   ctx.JSON(http.StatusOK, returnData)
 
@@ -69,14 +74,13 @@ func getMeasureImage(ctx *gin.Context) {
 //}
 
 // retrieve a single beat component image from a given source
-func retrieveImage(rhythm1, rhythm2 int, dir embed.FS) (string, error) {
+func retrieveImage(rhythm1, rhythm2 int, dir embed.FS) ([]byte, error) {
   imName := fmt.Sprintf("%d_%d.svg", rhythm1, rhythm2)
   imbytes, rerr := fs.ReadFile(dir,  fmt.Sprintf("%s/%s", getDirName(dir), imName))
   if rerr != nil {
-    return "", rerr 
+    return make([]byte, 0), rerr 
   }
-  imb64 := base64.StdEncoding.EncodeToString(imbytes)
-  return imb64, nil
+  return imbytes, nil
 }
 
 func TestRetrieve(ctx *gin.Context) {

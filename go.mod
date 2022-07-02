@@ -4,11 +4,13 @@ go 1.16
 
 require (
 	api/patterngen v1.0.0
-	github.com/srwiley/oksvg v0.0.0-20220128195007-1f435e4c2b44 // indirect
+	internal/svgutil v0.0.0-00010101000000-000000000000 // indirect
 )
 
 replace api/patterngen => ./api/patterngen
 
+replace assets/beatimages => ./assets/beatimages
+
 replace internal/patterns => ./internal/patterns
 
-replace assets/beatimages => ./assets/beatimages
+replace internal/svgutil => ./internal/svgutil
