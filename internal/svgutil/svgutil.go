@@ -1,6 +1,7 @@
 package svgutil 
 
 import (
+	"fmt"
 	"encoding/xml"
 	"errors"
 )
@@ -9,25 +10,41 @@ import (
 // string representing the combined files: 
 // The metadata from the first, and all <g>
 // from each
-func CombineSVG(svg1, svg2 string) (string, error) {
+func CombineSVG(svg1, svg2 []byte) ([]byte, error) {
 	svg2Groups, g2err := getGroups(svg2)
 	if g2err != nil {
-		return "", errors.New("Failed to recover groups from second SVG")
+		return make([]byte, 0), errors.New(fmt.Sprintf("Failed to recover groups from second SVG: %s", g2err.Error()))
 	}
 	combinedSvg, comboerr := insertGroups(svg1, svg2Groups)
 	if comboerr != nil {
-		return "", errors.New("Failed to merge collected groups into second SVG")
+		return make([]byte, 0), errors.New("Failed to merge collected groups into second SVG")
 	}
 	return combinedSvg, nil 
 }
 
-// recover all group data from the SVG, retaining depth
-func getGroups(svg string) ([]string, error) {
-	return make([]string, 0), nil 
+func getGroups(svg []byte) ([]G, error) {
+	svgData, e := bytesToSVG(svg)
+	if e != nil {
+		return make([]G, 0), e
+	}
+	return svgData.Groups, nil 
 }
+
 
 // insert groups into an SVG at the first layer (cshild of the
 // svg tag)
-func insertGroups(svg string, groups []string) (string, error) { 
-	return "", nil
+func insertGroups(svg []byte, groups []G) ([]byte, error) { 
+	svgData, e := bytesToSVG(svg)
+	if e != nil {
+		return svg, e
+	}
+	svgData.Groups = append(svgData.Groups, groups...)
+	remarshaled, re := xml.Marshal(svgData)
+	return remarshaled, re 
+}
+
+func bytesToSVG(svg []byte) (SVG, error) {
+	var svgData SVG
+	e := xml.Unmarshal(svg, &svgData)
+	return svgData, e
 }
