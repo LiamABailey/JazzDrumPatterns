@@ -33,32 +33,24 @@ func getMeasureImage(ctx *gin.Context) {
   returnData := gin.H{}
   for beatIx, bSeg := range beatSegments {
     //split into ride/snare/bass/hh 
-    beatComponents, serr := splitConvertPatternLists(bSeg, querySep)
+    beatEle, serr := splitConvertPatternLists(bSeg, querySep)
     if serr != nil {
       ctx.JSON(http.StatusBadRequest,
         gin.H{"error": fmt.Sprintf("Unable to parse query segment %s: %s",bSeg, serr.Error())})
         return
     }
-    if len(beatComponents) != 4 {
+    if len(beatEle) != 4 {
       ctx.JSON(http.StatusBadRequest,
         gin.H{"error": fmt.Sprintf("Expected 4 segments: ride/snare/bass/hh, received: %s",bSeg)})
         return
     }
-    imRS, imRSerr := retrieveImage(beatComponents[0], beatComponents[1], beatimages.RideSnareImages)
-    imBHH, imBHHerr := retrieveImage(beatComponents[2], beatComponents[3], beatimages.KickHiHatImages)
-    if (imRSerr != nil) || (imBHHerr != nil){
-      ctx.JSON(http.StatusInternalServerError,
-        gin.H{"error": fmt.Sprintf("Unable to retrieve images. Errors: Ride/Snare: %s; Bass/HiHat: %s", imRSerr.Error(), imBHHerr.Error())})
-      return
-    }
     beatIxStr := strconv.Itoa(beatIx)
-    mergedSvg, mergeErr := svgutil.CombineSVG(imRS, imBHH)
-    if mergeErr != nil {
-      ctx.JSON(http.StatusInternalServerError,
-        gin.H{"error": fmt.Sprintf("Unable to merge images. Error: %s", mergeErr.Error())})
-      return 
+    imb64, imerr := getBeatImageStr(beatEle[0], beatEle[1], beatEle[2], beatEle[3])
+    if imerr != nil {
+      ctx.JSON(http.StatusBadRequest,
+        gin.H{"error": fmt.Sprintf("Encountered while generating beat %s image: %s", beatIxStr, imerr)})
+        return
     }
-    imb64 := base64.StdEncoding.EncodeToString(mergedSvg)
     returnData[beatIxStr] = gin.H{"image":imb64}
   }
   ctx.JSON(http.StatusOK, returnData)
@@ -66,12 +58,20 @@ func getMeasureImage(ctx *gin.Context) {
 }
 
 // given a known ride/hihat/snare/kick pattern,
-// compose and return a single beat
-//func getBeatImage(ride, snare, kick, hihat int) (image.Image, error){
-  // TODO: implement
-  // step 1: get the image associated with the [ride, snare] or [kick, hihat] group
-  // step 2: layer the images to produce a composite and return
-//}
+// compose and return a single beat image as a b64 string
+func getBeatImageStr(ride, snare, kick, hihat int) (string, error){
+  imRS, imRSerr := retrieveImage(ride, snare, beatimages.RideSnareImages)
+  imBHH, imBHHerr := retrieveImage(kick, hihat, beatimages.KickHiHatImages)
+  if (imRSerr != nil) || (imBHHerr != nil){
+    return  "", fmt.Errorf("Unable to retrieve images. Errors: Ride/Snare: %s; Bass/HiHat: %s", imRSerr.Error(), imBHHerr.Error())
+  }
+  mergedSvg, mergeErr := svgutil.CombineSVG(imRS, imBHH)
+  if mergeErr != nil {
+    return "", fmt.Errorf("Unable to merge images. Error: %s", mergeErr.Error())
+  }
+  imb64 := base64.StdEncoding.EncodeToString(mergedSvg)
+  return imb64, nil
+}
 
 // retrieve a single beat component image from a given source
 func retrieveImage(rhythm1, rhythm2 int, dir embed.FS) ([]byte, error) {
