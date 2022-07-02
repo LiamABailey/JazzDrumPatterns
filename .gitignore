@@ -7,3 +7,6 @@
 
 # coverage tool output
 *.out
+
+# svgs used for construction of beat component SVGs
+assets/beatimages/components/*
