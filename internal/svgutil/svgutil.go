@@ -18,7 +18,7 @@ func CombineSVG(svg1, svg2 string) (string, error) {
 	if comboerr != nil {
 		return "", errors.New("Failed to merge collected groups into second SVG")
 	}
-	return scombinedSvg, nil 
+	return combinedSvg, nil 
 }
 
 // recover all group data from the SVG, retaining depth
