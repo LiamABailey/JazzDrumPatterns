@@ -83,15 +83,6 @@ func retrieveImage(rhythm1, rhythm2 int, dir embed.FS) ([]byte, error) {
   return imbytes, nil
 }
 
-func TestRetrieve(ctx *gin.Context) {
-  fmt.Println(ctx)
-  data, err := retrieveImage(0,0, beatimages.RideSnareImages)
-  if err != nil {
-    ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-  }
-  ctx.JSON(http.StatusOK, gin.H{"svg": data})
-}
-
 // get the name of the root of the
 // provided directory
 func getDirName(dir embed.FS) string {
