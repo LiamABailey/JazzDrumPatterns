@@ -3,10 +3,8 @@ package svgutil
 import "encoding/xml"
 
 type SVG struct {
-	XMLName xml.Name
-	Attrs 	[]xml.Attr 	`xml:",any,attr"`
-	Groups 	[]G			`xml:"g"`
-	Content []byte		`xml:",innerxml"`
+	XMLName 	xml.Name
+	Groups 		[]G			`xml:"g"`
 }
 
 type G struct {

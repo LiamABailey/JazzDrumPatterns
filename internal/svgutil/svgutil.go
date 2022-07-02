@@ -6,10 +6,10 @@ import (
 	"errors"
 )
 
-// given two SVGs X, Y(as text), returns a 
-// string representing the combined files: 
-// The metadata from the first, and all <g>
-// from each
+// given two SVGs X, Y returns a
+// []byte containing the <g> (group) elements
+// in the second level of Y (children of <svg>)
+// as children of <svg> in X.
 func CombineSVG(svg1, svg2 []byte) ([]byte, error) {
 	svg2Groups, g2err := getGroups(svg2)
 	if g2err != nil {
@@ -27,11 +27,17 @@ func getGroups(svg []byte) ([]G, error) {
 	if e != nil {
 		return make([]G, 0), e
 	}
+	// clear namespace 
+	for i := range svgData.Groups {
+		fmt.Println(svgData.Groups[i].XMLName)
+		svgData.Groups[i].XMLName.Space = ""
+		fmt.Println(svgData.Groups[i].XMLName)
+	}
 	return svgData.Groups, nil 
 }
 
 
-// insert groups into an SVG at the first layer (cshild of the
+// insert groups into an SVG at the first layer (shild of the
 // svg tag)
 func insertGroups(svg []byte, groups []G) ([]byte, error) { 
 	svgData, e := bytesToSVG(svg)
