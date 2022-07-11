@@ -31,7 +31,7 @@ func getGroups(svg []byte) ([]G, error) {
 }
 
 
-// insert groups into an SVG at the first layer (shild of the
+// insert groups into an SVG at the first layer (child of the
 // svg tag)
 func insertGroups(svg []byte, groups []G) ([]byte, error) { 
 	svgData, e := bytesToSVG(svg)
