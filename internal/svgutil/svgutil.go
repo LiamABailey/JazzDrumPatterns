@@ -7,38 +7,39 @@ import (
 )
 
 // given two SVGs X, Y returns a
-// []byte containing the <g> (group) elements
+// []byte containing the <g> and <path> (group, path) elements
 // in the second level of Y (children of <svg>)
 // as children of <svg> in X.
 func CombineSVG(svg1, svg2 []byte) ([]byte, error) {
-	svg2Groups, g2err := getGroups(svg2)
+	svg2Groups,svg2Paths, g2err := getGroupsPaths(svg2)
 	if g2err != nil {
 		return make([]byte, 0), errors.New(fmt.Sprintf("Failed to recover groups from second SVG: %s", g2err.Error()))
 	}
-	combinedSvg, comboerr := insertGroups(svg1, svg2Groups)
+	combinedSvg, comboerr := insertGroupsPaths(svg1, svg2Groups, svg2Paths)
 	if comboerr != nil {
 		return make([]byte, 0), errors.New("Failed to merge collected groups into second SVG")
 	}
 	return combinedSvg, nil 
 }
 
-func getGroups(svg []byte) ([]G, error) {
+func getGroupsPaths(svg []byte) ([]E, []E, error) {
 	svgData, e := bytesToSVG(svg)
 	if e != nil {
-		return make([]G, 0), e
+		return make([]E, 0),make([]E, 0), e
 	}
-	return svgData.Groups, nil 
+	return svgData.Groups, svgData.Paths, nil 
 }
 
 
-// insert groups into an SVG at the first layer (child of the
-// svg tag)
-func insertGroups(svg []byte, groups []G) ([]byte, error) { 
+// insert groups, paths into an SVG at the first layer 
+// (child of the svg tag)
+func insertGroupsPaths(svg []byte, groups []E, paths []E) ([]byte, error) { 
 	svgData, e := bytesToSVG(svg)
 	if e != nil {
 		return svg, e
 	}
 	svgData.Groups = append(svgData.Groups, groups...)
+	svgData.Paths = append(svgData.Paths, paths...)
 	remarshaled, re := xml.Marshal(svgData)
 	return remarshaled, re 
 }

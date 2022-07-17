@@ -4,10 +4,14 @@ import "encoding/xml"
 
 type SVG struct {
 	XMLName 	xml.Name
-	Groups 		[]G			`xml:"g"`
+	Groups 		[]E			`xml:"g"`
+	Paths		[]E			`xml:"path"`
 }
 
-type G struct {
+type E struct {
 	XMLName xml.Name
-	Content []byte		`xml:",innerxml"`
+	Transform	string		`xml:"transform,attr"`
+	D			string		`xml:"d,attr"`
+	Style		string		`xml:"style,attr"`
+	Content 	[]byte		`xml:",innerxml"`
 }
