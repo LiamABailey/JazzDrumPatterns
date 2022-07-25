@@ -6,5 +6,5 @@ import (
 
 func main() {
   patternsrv := patterngen.NewPatternServer()
-  patternsrv.Run()
+  patternsrv.Run(":8050")
 }
